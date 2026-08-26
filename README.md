@@ -119,8 +119,9 @@ sets, coverage excludes — edit the profile file and it takes effect on the nex
 run.
 
 The `ml` profile's `ignore_missing_imports` list (sklearn, scipy, matplotlib,
-datasets, transformers) is a starting guess. Swap in whatever you actually
-import, or it's dead config that could mask a real typo.
+datasets, transformers, seaborn, statsmodels, networkx, xgboost, lightgbm,
+cv2, nltk, tensorflow, keras) is a starting guess. Swap in whatever you
+actually import, or it's dead config that could mask a real typo.
 
 ## Licence
 

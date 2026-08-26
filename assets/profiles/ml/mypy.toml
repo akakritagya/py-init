@@ -25,5 +25,14 @@ module = [
   "matplotlib.*",
   "datasets.*",
   "transformers.*",
+  "seaborn.*",
+  "statsmodels.*",
+  "networkx.*",
+  "xgboost.*",
+  "lightgbm.*",
+  "cv2.*",
+  "nltk.*",
+  "tensorflow.*",
+  "keras.*",
 ]
 ignore_missing_imports = true
