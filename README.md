@@ -123,6 +123,11 @@ datasets, transformers, seaborn, statsmodels, networkx, xgboost, lightgbm,
 cv2, nltk, tensorflow, keras) is a starting guess. Swap in whatever you
 actually import, or it's dead config that could mask a real typo.
 
+## Changelog
+
+See [Releases](https://github.com/akakritagya/py-init/releases) for the
+downloadable `.skill` asset per version.
+
 ## Licence
 
 MIT — see [LICENSE](LICENSE).
