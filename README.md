@@ -37,6 +37,12 @@ supports the same format (Settings → Capabilities → Skills), so uploading th
 folder there works unmodified, as it runs in a sandboxed environment with
 bash and file access.
 
+For claude.ai (or anything that takes a packaged upload rather than a git
+clone), grab the `py-init.skill` zip from the
+[latest release](https://github.com/akakritagya/py-init/releases/latest)
+instead — it's just `SKILL.md` and `assets/`, with the repo's README, LICENSE
+and git metadata stripped out.
+
 For any other AI coding agent: it'll work if that agent (a) reads `SKILL.md`
 the way Claude Code and claude.ai do, and (b) gives the model bash and
 filesystem tools to run `uv`, `ruff`, `mypy`, etc. If it doesn't support
