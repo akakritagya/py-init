@@ -29,6 +29,19 @@ git clone https://github.com/akakritagya/py-init .claude/skills/py-init
 Restart Claude Code, then check it loaded by asking what skills are available,
 or invoke it directly with `/py-init`.
 
+### claude.ai and other agents
+
+This is a plain [Agent Skill](https://code.claude.com/docs/en/skills) —
+`SKILL.md` plus a few asset files, nothing Claude-Code-specific. claude.ai
+supports the same format (Settings → Capabilities → Skills), so uploading this
+folder there works unmodified, as it runs in a sandboxed environment with
+bash and file access.
+
+For any other AI coding agent: it'll work if that agent (a) reads `SKILL.md`
+the way Claude Code and claude.ai do, and (b) gives the model bash and
+filesystem tools to run `uv`, `ruff`, `mypy`, etc. If it doesn't support
+Skills at all, this won't plug in as-is.
+
 ### Requirements
 
 [uv](https://docs.astral.sh/uv/) on your PATH. Everything else the skill
@@ -102,16 +115,6 @@ run.
 The `ml` profile's `ignore_missing_imports` list (sklearn, scipy, matplotlib,
 datasets, transformers) is a starting guess. Swap in whatever you actually
 import, or it's dead config that could mask a real typo.
-
-## Caveats
-
-- The pinned versions in `assets/` are an August 2026 snapshot. The skill
-  refreshes them at scaffold time, but if a tool crosses a **major** boundary
-  (ruff 0.17+, mypy 3.x) config keys may have moved and the asset needs review.
-  PRs welcome.
-- The local pre-commit hooks use `language: system` with `uv run`, so CI must
-  install uv before running `pre-commit run --all-files`.
-- uv doesn't replace conda for CUDA toolkits and other non-Python binaries.
 
 ## Licence
 
