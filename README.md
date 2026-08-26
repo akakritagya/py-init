@@ -22,9 +22,23 @@ git clone https://github.com/akakritagya/py-init ~/.claude/skills/py-init
 
 ### Claude Code — project (commit it, whole team gets it)
 
+`git clone` leaves a nested `.git/` behind, which git treats as an embedded
+repo rather than files — commit it as-is and teammates get an **empty
+directory**, not the skill. Pick one of these instead:
+
 ```bash
+# Option A: clone, then drop the nested .git so the files commit normally
 git clone https://github.com/akakritagya/py-init .claude/skills/py-init
+rm -rf .claude/skills/py-init/.git
 ```
+
+```bash
+# Option B: skip git entirely — download and unzip the packaged release
+curl -LO https://github.com/akakritagya/py-init/releases/latest/download/py-init.skill
+unzip py-init.skill -d .claude/skills/ && rm py-init.skill
+```
+
+Either way, `git add .claude/skills/py-init` afterwards to actually commit it.
 
 Restart Claude Code, then check it loaded by asking what skills are available,
 or invoke it directly with `/py-init`.
