@@ -1,0 +1,29 @@
+# mypy — ml profile
+# strict = false: experiment code churns faster than its annotations, and
+# strict mode on a training loop mostly produces noise about array shapes it
+# can't check anyway. The checks that survive are the ones that catch real
+# bugs cheaply.
+# Append verbatim to pyproject.toml. Substitute python_version to match
+# .python-version — mypy does NOT read requires-python.
+[tool.mypy]
+python_version = "3.14"       # mypy does NOT read requires-python — set it here
+files = ["src"]               # not tests: experiment tests are often throwaway
+strict = false
+check_untyped_defs = true     # still look inside unannotated functions
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_unreachable = true       # catches real bugs
+pretty = true
+
+# Scientific stacks ship partial or absent stubs. Scope this per-module and
+# extend the list as you add libraries — never set ignore_missing_imports
+# globally, or a genuine typo in an import goes unnoticed.
+[[tool.mypy.overrides]]
+module = [
+  "sklearn.*",
+  "scipy.*",
+  "matplotlib.*",
+  "datasets.*",
+  "transformers.*",
+]
+ignore_missing_imports = true

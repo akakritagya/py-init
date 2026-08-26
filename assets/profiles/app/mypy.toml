@@ -1,0 +1,21 @@
+# mypy — app profile
+# Identical to strict: the app profile relaxes ruff's docstring rules, not
+# type checking. A service that lies about its return types breaks in
+# production the same way a library does.
+# Append verbatim to pyproject.toml. Substitute python_version to match
+# .python-version — mypy does NOT read requires-python.
+[tool.mypy]
+python_version = "3.14"       # mypy does NOT read requires-python — set it here
+files = ["src", "tests"]
+strict = true                 # ~15 flags at once; start here on a new project
+warn_unreachable = true       # not in strict, but catches real bugs
+pretty = true
+
+# per-module escape hatches — note the DOUBLE brackets (array of tables)
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = ["some_untyped_lib.*"]
+ignore_missing_imports = true   # scope this per-module, never globally

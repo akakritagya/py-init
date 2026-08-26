@@ -1,0 +1,30 @@
+# pytest + coverage — ml profile
+# Same as the shared file minus filterwarnings = ["error"]. numpy, torch and
+# sklearn emit deprecation warnings constantly through no fault of yours;
+# promoting those to errors turns a green suite red on somebody else's release
+# schedule, and the usual fix is that people stop running the suite.
+# Append verbatim to pyproject.toml. Check coverage source matches the layout.
+[tool.pytest.ini_options]
+testpaths = ["tests"]          # don't scan .venv, don't scan src
+addopts = [
+    "-ra",                     # summary of everything that wasn't a plain pass
+    "--strict-markers",        # a typo'd marker is an error, not a silent skip
+    "--strict-config",         # a typo'd config key here is an error too
+    "--import-mode=importlib", # modern import mode; no __init__.py in tests/
+]
+xfail_strict = true            # an xfail that passes is a failure, not a shrug
+markers = [
+    "slow: takes more than a second",
+    "integration: touches the network or a real DB",
+    "gpu: needs CUDA",
+]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true          # was every if/else arm taken, not just every line
+
+[tool.coverage.report]
+exclude_also = [       # `also`, not `exclude_lines` — that one replaces the defaults
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
