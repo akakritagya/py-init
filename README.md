@@ -12,6 +12,26 @@ Based on [How I Set Up a Python Project in 2026](https://akakritagya.hashnode.de
 
 ---
 
+## Scope
+
+This scaffolds the **tooling layer** for a single Python project — uv, ruff,
+mypy, pytest, pre-commit, wired together in one `pyproject.toml`. It's
+domain-agnostic: no framework, no dependencies beyond the five tools above,
+just a clean `src/<name>/` package that lints, type-checks and tests itself.
+
+| Works well for | Out of scope |
+| --- | --- |
+| CLIs, services, libraries, ML/DL experiment code — anything that's *one* Python package | Installing or configuring a framework (FastAPI, Django, PyTorch, an agent SDK, a desktop GUI toolkit) — add it yourself with `uv add` after scaffolding |
+| A single `pyproject.toml` project | Monorepos / `uv workspace` setups — the skill guards against scaffolding into a directory that already has a `pyproject.toml`, so it won't add a member to an existing workspace |
+| Python code | Frontends — no JS/TS/React tooling of any kind |
+
+Concretely: it'll happily set up a FastAPI backend or a PyTorch training repo
+— you just add the framework yourself afterward, and the whole project shares
+one [profile](#three-profiles) (there's no way to be `strict` on an API layer
+and `ml`-relaxed on training code within the same scaffold). For an
+end-to-end system with a frontend, multiple services, or a monorepo, run this
+once per Python package and wire the rest together by hand.
+
 ## Install
 
 ### Claude Code — personal (all your projects)
@@ -96,7 +116,7 @@ version** — then runs a fixed sequence:
 ## Three profiles
 
 | Profile | For | What changes |
-|---|---|---|
+| --- | --- | --- |
 | `strict` | libraries, long-lived code | everything on: `D` docstrings, `ANN`, `mypy strict`, warnings-as-errors |
 | `app` | services, CLIs (**default**) | no global docstring rules |
 | `ml` | experiments, training code | `mypy strict = false`, no `D`/`ANN`, warnings not promoted to errors, `data/` excluded |
