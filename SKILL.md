@@ -1,6 +1,6 @@
 ---
 name: py-init
-description: Scaffold a new Python project with the modern uv/ruff/mypy/pytest/pre-commit toolchain, fully configured in pyproject.toml. Use this whenever the user starts a new Python project, sets up a fresh repo, mentions `uv init`, asks to scaffold a CLI/library/FastAPI/ML project, or asks how to set up Python tooling — even if they don't name the tools. Also use when a Python project needs linting, formatting, type checking, testing, or pre-commit hooks added from scratch.
+description: Use when the user types `uv init`, `py init`, or otherwise starts a new Python project or fresh repo; asks to scaffold a CLI/library/FastAPI/ML project; or asks how to set up Python linting, formatting, type checking, testing, or pre-commit hooks from scratch — even if they don't name the tools.
 ---
 
 # py-init
@@ -45,29 +45,14 @@ situation and proceed. `pyproject.toml` present is never waved through.
      `--name <name>` overrides the derived name if the directory is called
      something else.
 
-   **Validate the name before running anything.** uv normalizes the
-   distribution name (lowercase, separators to hyphens) and derives the module
-   name by swapping those back to underscores — but it does **not** check the
-   result is a legal Python identifier:
-
-   | Given | Distribution | Module dir |
-   |---|---|---|
-   | `svc` | `svc` | `src/svc/` |
-   | `name-test` | `name-test` | `src/name_test/` |
-   | `My_App` | `my-app` | `src/my_app/` |
-   | `my.app` | `my-app` | `src/my_app/` |
-
-   `uv init --app --package 2fast` and `... class` both scaffold cleanly and
-   produce packages that raise `SyntaxError` on import — uv even writes
-   `2fast = "2fast:main"` as the entry point. Nothing fails until someone
-   imports it. So reject up front, before `uv init`, any name whose module form
-   starts with a digit, is a Python keyword, or doesn't match
+   **Validate the name before running anything.** uv derives a module name
+   from the distribution name but does **not** check the result is a legal
+   Python identifier — reject up front, before `uv init`, any name whose
+   module form starts with a digit, is a Python keyword, or doesn't match
    `[a-z_][a-z0-9_]*`. Ask for a different name; don't scaffold and hope.
-
-   In the current-directory case this applies to the *directory* name, which
-   the user may not have chosen with Python in mind — `uv init` in a folder
-   called `weird dir` yields distribution `weird-dir` and module `weird_dir`.
-   Check it and offer `--name` if it doesn't work.
+   Applies to the *directory* name too in the current-directory case. See
+   `references/pitfalls.md#naming-step-2` for how uv normalizes names and
+   what breaks if you skip this.
 2. **Profile** — `strict`, `app`, or `ml`. See the table below. Default to
    `app` if the user doesn't care.
 3. **Python version.** Run `uv python list` first so the user picks from what's
@@ -116,17 +101,10 @@ common case; a project meant to be imported by others is `--lib`.
 chosen version, with nothing to reconcile afterwards.
 
 **Don't init first and pin afterwards.** `uv python pin` validates against
-`requires-python` and refuses anything outside it:
-
-```
-error: The requested Python version `3.13` is incompatible with the
-project `requires-python` value of `>=3.14`.
-```
-
-Recovering from that means editing `requires-python` by hand before pinning,
-and a half-done recovery leaves `.python-version` and `requires-python`
-disagreeing — a mismatch mypy's `python_version` then inherits in step 5.
-Passing `--python` up front avoids the whole sequence.
+`requires-python` and refuses anything outside it, and recovering from that
+leaves the two files easy to mismatch. Passing `--python` up front avoids the
+whole sequence — see `references/pitfalls.md#python-version-pinning-step-3`
+for the failure mode this sidesteps.
 
 Confirm both files agree before moving on. Treat `requires-python`,
 `.python-version`, and mypy's `python_version` as three names for one decision.
@@ -154,11 +132,10 @@ These are the spots that go wrong silently. Handle each one explicitly:
 | `[project.scripts]` | already written by `uv init` for apps; confirm rather than rewrite |
 | `[tool.coverage.run] source` | `["src"]` is correct for the default uv layout — change it only if the layout differs |
 
-**`known-first-party` takes the module name, not the project name.** For a
-project called `name-test`, the module is `name_test` — putting the hyphenated
-form here means isort never matches it and sorts your own imports into the
-third-party block. Silent, and a green run. Get it from the directory that
-exists:
+**`known-first-party` takes the module name, not the project name** — get it
+from the directory that exists, don't retype the project name (see
+`references/pitfalls.md#known-first-party-vs-project-name-step-5` for what
+silently breaks if you do):
 
 ```shell
 ls src/        # this is the name that goes in known-first-party
@@ -178,10 +155,10 @@ actually installs. It's handled in step 6.
 uv add --dev ruff mypy pytest pytest-cov pre-commit
 ```
 
-**No upper bounds on the install command.** The article this skill is based on
-shows `uv add --dev "ruff>=0.16.4,<0.17"` — that form caps resolution at
-August-2026 versions, so a project scaffolded a year later gets year-old tools.
-Install unbounded so today's project gets today's tools.
+**No upper bounds on the install command** — an upper-bounded install caps
+resolution at today's versions, so a project scaffolded a year later gets
+year-old tools. Install unbounded so today's project gets today's tools (see
+`references/pitfalls.md#why-install-unbounded-then-pin-bounded-step-6`).
 
 Then read what uv actually resolved (`uv pip list` or the `[dependency-groups]`
 block) and record bounded pins:
@@ -262,27 +239,11 @@ two-line fix is working correctly.
 Also add a minimal `tests/` file so pytest has something to collect; an empty
 run with `--strict-config` reports no tests rather than success.
 
-## Notes worth passing on
+## Notes worth passing on, and what to add later
 
-- **CI needs uv.** The local pre-commit hooks use `language: system` with
-  `uv run`, so any CI job running `pre-commit run --all-files` must install uv
-  first.
-- **uv doesn't replace conda** for CUDA toolkits and other non-Python binaries.
-  Relevant to the `ml` profile: uv manages the Python side, the system or conda
-  still provides the native stack.
-- **uv is pre-1.0** (0.12.x at time of writing). Stable and widely used in
-  production; the version number is misleading.
-- **Not everything has to land on day one.** If the user wants less, start with
-  `uv init` plus ruff and add the rest when it's needed. A setup nobody runs is
-  worse than a smaller one they do.
-
-## Worth adding later, not by default
-
-- `pydantic-settings` — scattered `os.environ` calls become one typed object
-  that fails at startup rather than at 3am.
-- `structlog` — structured JSON logs an aggregator can query.
-- `uv build` / `uv publish` with trusted publishing — no API token in repo
-  secrets; a tag-triggered CI job turns releases into `git tag && git push --tags`.
+See `references/pitfalls.md` for CI/uv, the `ml` profile's conda boundary, uv's
+pre-1.0 status, scaling the setup down for small projects, and optional
+additions (`pydantic-settings`, `structlog`, `uv build`/`uv publish`).
 
 ## Daily commands (for the user, after setup)
 
