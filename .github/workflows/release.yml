@@ -19,6 +19,7 @@ jobs:
           mkdir -p build/py-init
           cp SKILL.md build/py-init/
           cp -r assets build/py-init/assets
+          cp -r references build/py-init/references
           cd build
           zip -r py-init.skill py-init
 
