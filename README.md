@@ -74,8 +74,8 @@ bash and file access.
 For claude.ai (or anything that takes a packaged upload rather than a git
 clone), grab the `py-init.skill` zip from the
 [latest release](https://github.com/akakritagya/py-init/releases/latest)
-instead — it's just `SKILL.md` and `assets/`, with the repo's README, LICENSE
-and git metadata stripped out.
+instead — it's just `SKILL.md`, `assets/`, and `references/`, with the repo's
+README, LICENSE and git metadata stripped out.
 
 For any other AI coding agent: it'll work if that agent (a) reads `SKILL.md`
 the way Claude Code and claude.ai do, and (b) gives the model bash and
@@ -110,8 +110,9 @@ version** — then runs a fixed sequence:
 4. Substitutes the per-project values that models usually get wrong
 5. Installs tools **unbounded**, records **bounded** pins
 6. Writes `.pre-commit-config.yaml`, runs `autoupdate`, installs all three hook stages
-7. Greps for leftover placeholders
-8. Verifies: `ruff check --fix` → `ruff format` → `mypy` → `pytest`
+7. Writes a `README.md` with project name, dev setup, and verify setup sections
+8. Greps for leftover placeholders
+9. Verifies: `ruff check --fix` → `ruff format` → `mypy` → `pytest`
 
 ## Three profiles
 
