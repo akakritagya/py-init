@@ -199,7 +199,39 @@ that gets `--no-verify`'d once it grows past a few seconds.
 Note `pass_filenames: false` on the mypy hook: mypy needs the whole package to
 resolve types, not just the staged files.
 
-## Step 8 — Check for placeholder leakage
+## Step 8 — Write the README
+
+`uv init` leaves `README.md` as a bare `# <name>` heading. Replace it with:
+
+```markdown
+# <project name>
+
+## Development setup
+
+\`\`\`shell
+uv sync
+uv run pre-commit install --install-hooks \
+  --hook-type pre-commit --hook-type pre-push --hook-type commit-msg
+\`\`\`
+
+## Verify setup
+
+\`\`\`shell
+uv run ruff check .
+uv run ruff format --check .
+uv run mypy
+uv run pytest
+\`\`\`
+```
+
+The project name heads the file — use the distribution name from `pyproject.toml`,
+not the module name. The development-setup block mirrors Step 7. The verify
+block is deliberately the non-mutating form (`ruff format --check`, no
+`--fix`) — it's for a user confirming their clone already passes, not for
+scaffolding-time fixing, which is what Step 10 does. Keep both blocks in sync
+if the underlying steps' commands change.
+
+## Step 9 — Check for placeholder leakage
 
 Before running anything:
 
@@ -214,7 +246,7 @@ This check exists because nothing downstream catches it. A stale
 `known-first-party` or `coverage source` produces a perfectly green run while
 sorting imports into the wrong group and measuring coverage on nothing.
 
-## Step 9 — Verify
+## Step 10 — Verify
 
 Run in this exact order and report the results:
 
